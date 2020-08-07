@@ -1,27 +1,39 @@
 import * as React from "react";
 import { View, StyleSheet, Button } from "react-native";
 import { Video } from "expo-av";
+import * as ImagePicker from "expo-image-picker";
 
 export default class App extends React.Component {
   state = {
-    source: undefined,
+    videoPath: undefined,
   };
 
   render() {
-    console.log("RENDER, source: ", this.state.source);
     return (
       <View style={styles.container}>
         <Button
-          title="Toggle Video Source"
-          onPress={() =>
-            this.setState((state) => ({
-              source: state.source ? undefined : require("./assets/video.mp4"),
-            }))
-          }
+          title="Pick Video"
+          onPress={async () => {
+            const {
+              status,
+            } = await ImagePicker.requestCameraRollPermissionsAsync();
+            if (status == "granted") {
+              const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+                quality: 1,
+              });
+              console.log("RESULT: ", result);
+              if (!result.cancelled) {
+                this.setState({ videoPath: result.uri });
+              }
+            }
+          }}
         />
         <Video
           style={styles.video}
-          source={this.state.source || { uri: null }}
+          source={
+            this.state.videoPath ? { uri: this.state.videoPath } : undefined
+          }
           shouldPlay={true}
           isLooping
           useNativeControls={true}
