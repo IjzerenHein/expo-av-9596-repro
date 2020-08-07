@@ -1,21 +1,46 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from "react";
+import { View, StyleSheet, Button } from "react-native";
+import { Video } from "expo-av";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+export default class App extends React.Component {
+  state = {
+    source: undefined,
+  };
+
+  render() {
+    console.log("RENDER, source: ", this.state.source);
+    return (
+      <View style={styles.container}>
+        <Button
+          title="Toggle Video Source"
+          onPress={() =>
+            this.setState((state) => ({
+              source: state.source ? undefined : require("./assets/video.mp4"),
+            }))
+          }
+        />
+        <Video
+          style={styles.video}
+          source={this.state.source || { uri: null }}
+          shouldPlay={true}
+          isLooping
+          useNativeControls={true}
+          resizeMode={Video.RESIZE_MODE_CONTAIN}
+          onError={(err) => console.log("onError: ", err)}
+        />
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 100,
+  },
+  video: {
+    marginTop: 20,
+    width: 300,
+    height: 400,
   },
 });
